@@ -10,3 +10,16 @@ managed_components/
 
 # macOS
 .DS_Store
+
+# Credentials and secrets — never commit these
+credentials*.h
+credentials*.hpp
+credentials*.cpp
+secrets*.h
+secrets*.hpp
+wifi_creds*.h
+*_credentials.*
+*_secrets.*
+# Kconfig local overrides that may contain real SSID/passwords
+sdkconfig.local
+
