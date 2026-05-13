@@ -101,7 +101,11 @@ static void knob_rotated(void)
 {
     s_rotary_flag = false;
     int movement = (s_rotation_counter < s_prev_rotation) ? 1 : -1;
-    ESP_LOGI(TAG, s_rotation_counter < s_prev_rotation ? "L%d" : "R%d", s_rotation_counter);
+    if (s_rotation_counter < s_prev_rotation) {
+        ESP_LOGI(TAG, "L%d", s_rotation_counter);
+    } else {
+        ESP_LOGI(TAG, "R%d", s_rotation_counter);
+    }
     s_prev_rotation = s_rotation_counter;
 
     uint8_t btn = s_mouse_right_mode ? BLE_MOUSE_RIGHT : BLE_MOUSE_LEFT;
