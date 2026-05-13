@@ -100,7 +100,7 @@ static esp_err_t ota_post_handler(httpd_req_t *req)
     s_ota_started = true;
 
     while (remaining > 0) {
-        int recv_len = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)));
+        int recv_len = httpd_req_recv(req, buf, remaining < (int)sizeof(buf) ? remaining : (int)sizeof(buf));
         if (recv_len <= 0) {
             if (recv_len == HTTPD_SOCK_ERR_TIMEOUT) continue;
             ESP_LOGE(TAG, "OTA receive error");
@@ -195,9 +195,9 @@ void wifi_ota_start(void)
     esp_netif_dhcpc_stop(sta_netif);
     esp_netif_ip_info_t ip_info;
     memset(&ip_info, 0, sizeof(ip_info));
-    ipaddr_aton(CONFIG_DAWKNOB_STATIC_IP, (ip_addr_t *)&ip_info.ip);
-    ipaddr_aton(CONFIG_DAWKNOB_GATEWAY_IP, (ip_addr_t *)&ip_info.gw);
-    IP4_ADDR(&ip_info.netmask, 255, 255, 255, 0);
+    ip_info.ip.addr      = esp_ip4addr_aton(CONFIG_DAWKNOB_STATIC_IP);
+    ip_info.gw.addr      = esp_ip4addr_aton(CONFIG_DAWKNOB_GATEWAY_IP);
+    ip_info.netmask.addr = esp_ip4addr_aton("255.255.255.0");
     esp_netif_set_ip_info(sta_netif, &ip_info);
 
     esp_event_handler_instance_t instance_any_id;
