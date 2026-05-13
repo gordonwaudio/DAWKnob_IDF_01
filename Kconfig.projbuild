@@ -1,0 +1,27 @@
+menu "DAWKnob Configuration"
+
+    config DAWKNOB_WIFI_SSID
+        string "WiFi SSID"
+        default "your_ssid_here"
+        help
+            SSID (network name) for the OTA WiFi connection.
+
+    config DAWKNOB_WIFI_PASSWORD
+        string "WiFi Password"
+        default "your_password_here"
+        help
+            WiFi password for the OTA WiFi connection.
+
+    config DAWKNOB_STATIC_IP
+        string "Static IP Address"
+        default "192.168.1.103"
+        help
+            Static IP address for the device on the local network.
+
+    config DAWKNOB_GATEWAY_IP
+        string "Gateway IP Address"
+        default "192.168.1.254"
+        help
+            Gateway/router IP address.
+
+endmenu
