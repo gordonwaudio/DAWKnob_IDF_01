@@ -96,10 +96,45 @@ Use `Ctrl+E B` to build, `Ctrl+E F` to flash, `Ctrl+E M` to open the monitor.
 
 ## OTA Updates
 
-1. Press the WiFi button (GPIO27) to switch from BLE to WiFi mode
-2. Wait for the WiFi LED (GPIO18) to light up
-3. Browse to `http://192.168.1.103` (or your configured static IP)
-4. Upload a new firmware `.bin` file via the web form
+OTA lets you flash new firmware over WiFi without a USB cable.
+
+### 1. Build the new firmware
+
+```bash
+. /Volumes/M2_2TB_Thunder/esp/v5.5.2/esp-idf/export.sh   # if not already active
+cd /Volumes/M2_2TB_Thunder/Dev/MCs/ESP32/DAWKnob_IDF_01
+idf.py build
+```
+
+The binary to upload is `build/DAWKnob_IDF_01.bin`.
+
+### 2. Switch the device to WiFi mode
+
+With the device powered on and BLE running, press and hold the **WiFi button (GPIO27)**.  
+The **WiFi LED (GPIO18)** will light up once the device has connected to your network.
+
+### 3. Open the update page
+
+In a browser on the same network, navigate to:
+
+```
+http://192.168.1.103
+```
+
+Replace `192.168.1.103` with whatever static IP you set in menuconfig if you changed it.
+
+### 4. Upload the firmware
+
+1. Click **Choose File** and select `build/DAWKnob_IDF_01.bin`
+2. Click **Upload Firmware**
+3. Wait for the "Update successful! Rebooting..." message
+4. The device will restart automatically and return to BLE mode
+
+### Notes
+
+- The device must be on the same WiFi network as your computer
+- Upload only `.bin` files built for this project — flashing an incompatible binary will cause a boot loop (recover via USB flash as normal)
+- If the page doesn't load, check the WiFi LED is on and verify the static IP in menuconfig matches your network's subnet
 
 ## BLE Behaviour
 
