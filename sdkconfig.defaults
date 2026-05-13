@@ -14,3 +14,6 @@ CONFIG_LOG_DEFAULT_LEVEL_INFO=y
 
 # FreeRTOS tick rate (needed for accurate delays)
 CONFIG_FREERTOS_HZ=1000
+
+# Flash size — two-OTA partition table requires at least 4MB
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
