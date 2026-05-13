@@ -27,24 +27,72 @@ A BLE HID mouse device built on ESP32 that maps a rotary encoder to mouse scroll
 
 ## First-time Setup
 
-### 1. Configure WiFi credentials
+### 1. Activate the ESP-IDF environment
+
+This must be done in every new terminal session before using `idf.py`:
 
 ```bash
-idf.py menuconfig
-# → DAWKnob Configuration → set SSID, password, static IP
+. /Volumes/M2_2TB_Thunder/esp/v5.5.2/esp-idf/export.sh
 ```
 
-### 2. Build and flash
+To avoid repeating this, add a shortcut alias to `~/.zshrc`:
+
+```bash
+echo 'alias get_idf=". /Volumes/M2_2TB_Thunder/esp/v5.5.2/esp-idf/export.sh"' >> ~/.zshrc
+```
+
+Then just run `get_idf` at the start of each session.
+
+### 2. Configure WiFi credentials
+
+```bash
+cd /Volumes/M2_2TB_Thunder/Dev/MCs/ESP32/DAWKnob_IDF_01
+idf.py menuconfig
+# → DAWKnob Configuration → set SSID, password, static IP
+# Press S to save, Q to quit
+```
+
+### 3. Build
 
 ```bash
 idf.py build
+```
+
+The compiled binary will be at `build/DAWKnob_IDF_01.bin`.
+
+### 4. Find your serial port
+
+Plug in the ESP32 via USB, then:
+
+```bash
+ls /dev/cu.usb*
+# or
+ls /dev/cu.wchusbserial*
+```
+
+Use the port name shown in the next step.
+
+### 5. Flash and monitor
+
+```bash
 idf.py -p /dev/cu.usbserial-XXXX flash monitor
 ```
 
-### 3. VS Code
+Replace `/dev/cu.usbserial-XXXX` with your actual port.  
+Press `Ctrl+]` to exit the monitor.
+
+To flash and monitor in separate steps:
+
+```bash
+idf.py -p /dev/cu.usbserial-XXXX flash
+idf.py -p /dev/cu.usbserial-XXXX monitor
+```
+
+### 6. VS Code
 
 Open this folder in VS Code. The ESP-IDF extension will pick up `settings.json` automatically.
-Update `idf.port` in `.vscode/settings.json` to match your serial port.
+Update `idf.port` in `.vscode/settings.json` to match your serial port.  
+Use `Ctrl+E B` to build, `Ctrl+E F` to flash, `Ctrl+E M` to open the monitor.
 
 ## OTA Updates
 
