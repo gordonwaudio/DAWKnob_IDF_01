@@ -1,0 +1,10 @@
+# DAWKnob IDF partition table
+# Flash: 4MB. Binary ~1.2MB so each OTA slot needs at least 0x140000.
+# Using 0x180000 (1.5MB) slots leaves ~960KB spare at the top.
+#
+# Name,     Type, SubType,  Offset,   Size
+nvs,        data, nvs,      0x9000,   0x4000
+otadata,    data, ota,      0xd000,   0x2000
+phy_init,   data, phy,      0xf000,   0x1000
+ota_0,      app,  ota_0,    0x10000,  0x180000
+ota_1,      app,  ota_1,    0x190000, 0x180000
