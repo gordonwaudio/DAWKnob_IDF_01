@@ -43,7 +43,7 @@
 // Timing constants (ms)
 #define PULSE_GAP_MS    20
 #define DEBOUNCE_MS     200
-#define KNOB_SENS_MS    1000
+#define KNOB_IDLE_MS    500
 
 // Filter period (matches original samplePeriod = 1000.0 using micros())
 #define SAMPLE_PERIOD   1000.0f
@@ -57,7 +57,6 @@ static int   s_prev_rotation = 0;
 static int   s_movement_scale = 10;
 static bool  s_mouse_right_mode = true;   // true = right button, false = left
 static bool  s_mouse_pressed = false;
-static int   s_mouse_move_accum = 0;
 static int64_t s_last_knob_ms = 0;
 static bool  s_wifi_active = false;
 
@@ -109,18 +108,18 @@ static void knob_rotated(void)
     s_prev_rotation = s_rotation_counter;
 
     uint8_t btn = s_mouse_right_mode ? BLE_MOUSE_RIGHT : BLE_MOUSE_LEFT;
+
+    // Press and hold the button across multiple ticks — gives the host
+    // enough time to register the button before move events arrive
     if (!s_mouse_pressed) {
         ble_mouse_press(btn);
         s_mouse_pressed = true;
-        s_mouse_move_accum = 0;
     }
 
     int delta = movement * s_movement_scale;
-    // Clamp to int8_t range
     if (delta >  127) delta =  127;
     if (delta < -127) delta = -127;
 
-    s_mouse_move_accum += delta;
     ble_mouse_move(0, (int8_t)delta);
     s_last_knob_ms = esp_timer_get_time() / 1000LL;
 }
@@ -206,17 +205,11 @@ static void main_task(void *pvParameters)
     while (1) {
         int64_t now_ms = esp_timer_get_time() / 1000LL;
 
-        // Release mouse button after inactivity (mirrors original knobSens logic)
-        if (s_mouse_pressed && (now_ms - s_last_knob_ms > KNOB_SENS_MS)) {
+        // Release button after knob has been idle — no return move,
+        // the DAW restores the cursor position itself on mouseup
+        if (s_mouse_pressed && (now_ms - s_last_knob_ms > KNOB_IDLE_MS)) {
             ble_mouse_release();
             s_mouse_pressed = false;
-            if (s_mouse_move_accum != 0) {
-                int back = -s_mouse_move_accum;
-                if (back >  127) back =  127;
-                if (back < -127) back = -127;
-                ble_mouse_move(0, (int8_t)back);
-                s_mouse_move_accum = 0;
-            }
         }
 
         if (s_rotary_flag) {

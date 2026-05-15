@@ -39,7 +39,7 @@ static esp_ble_adv_data_t s_hidd_adv_data = {
     .include_txpower     = true,
     .min_interval        = 0x0006,
     .max_interval        = 0x0010,
-    .appearance          = 0x03c0,  // HID Generic
+    .appearance          = 0x03c2,  // HID Mouse
     .manufacturer_len    = 0,
     .p_manufacturer_data = NULL,
     .service_data_len    = 0,
@@ -129,7 +129,7 @@ void ble_mouse_init(void)
     esp_ble_gap_register_callback(gap_event_handler);
     esp_hidd_register_callbacks(hidd_event_callback);
 
-    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_BOND;
+    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
     esp_ble_io_cap_t iocap = ESP_IO_CAP_NONE;
     uint8_t key_size = 16;
     uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
@@ -165,6 +165,8 @@ bool ble_mouse_is_connected(void)
 
 void ble_mouse_press(uint8_t buttons)
 {
+    ESP_LOGI(TAG, "press: connected=%d sec=%d ready=%d buttons=0x%02x",
+             s_connected, s_sec_conn, ble_mouse_is_connected(), buttons);
     if (!ble_mouse_is_connected()) return;
     s_buttons = buttons;
     esp_hidd_send_mouse_value(s_conn_id, s_buttons, 0, 0);
@@ -172,6 +174,7 @@ void ble_mouse_press(uint8_t buttons)
 
 void ble_mouse_release(void)
 {
+    ESP_LOGI(TAG, "release: connected=%d", s_connected);
     if (!s_connected) return;
     s_buttons = 0;
     esp_hidd_send_mouse_value(s_conn_id, 0, 0, 0);
@@ -179,6 +182,7 @@ void ble_mouse_release(void)
 
 void ble_mouse_move(int8_t x, int8_t y)
 {
+    ESP_LOGI(TAG, "move: connected=%d s_buttons=0x%02x x=%d y=%d", s_connected, s_buttons, x, y);
     if (!ble_mouse_is_connected()) return;
     esp_hidd_send_mouse_value(s_conn_id, s_buttons, x, y);
 }

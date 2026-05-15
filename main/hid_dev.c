@@ -39,14 +39,18 @@ void hid_dev_send_report(esp_gatt_if_t gatts_if, uint16_t conn_id,
 {
     hid_report_map_t *p_rpt;
 
-    // get att handle for report
     if ((p_rpt = hid_dev_rpt_by_id(id, type)) != NULL) {
-        // if notifications are enabled
-        ESP_LOGD(HID_LE_PRF_TAG, "%s(), send the report, handle = %d", __func__, p_rpt->handle);
-        esp_ble_gatts_send_indicate(gatts_if, conn_id, p_rpt->handle, length, data, false);
+        ESP_LOGI(HID_LE_PRF_TAG, "send_report id=%d type=%d handle=0x%04x len=%d data=[%02x %02x %02x %02x]",
+                 id, type, p_rpt->handle, length,
+                 length > 0 ? data[0] : 0, length > 1 ? data[1] : 0,
+                 length > 2 ? data[2] : 0, length > 3 ? data[3] : 0);
+        esp_err_t err = esp_ble_gatts_send_indicate(gatts_if, conn_id, p_rpt->handle, length, data, false);
+        if (err != ESP_OK) {
+            ESP_LOGE(HID_LE_PRF_TAG, "send_indicate failed: 0x%x", err);
+        }
+    } else {
+        ESP_LOGE(HID_LE_PRF_TAG, "send_report: no report found for id=%d type=%d", id, type);
     }
-
-    return;
 }
 
 void hid_consumer_build_report(uint8_t *buffer, consumer_cmd_t cmd)

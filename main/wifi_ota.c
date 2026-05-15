@@ -26,21 +26,30 @@
 static EventGroupHandle_t s_wifi_event_group;
 static int s_retry_num = 0;
 
-// Landing page HTML
+// Landing page HTML — uses fetch() to POST raw binary, not multipart/form-data
 static const char *INDEX_HTML =
     "<!DOCTYPE html><html><head><title>DAWKnob</title>"
     "<style>body{background-color:#003080;color:white;font-family:Arial,sans-serif;padding:20px;}"
     "h1{color:#ffffff;}input[type=file]{margin:10px 0;display:block;}"
-    "input[type=submit]{background:#00a0ff;color:white;border:none;padding:10px 20px;"
+    "button{background:#00a0ff;color:white;border:none;padding:10px 20px;"
     "border-radius:4px;cursor:pointer;font-size:16px;}"
     "</style></head><body>"
     "<h1>DAWKnob</h1>"
     "<p>ESP32 DAWKnob IDF - OTA Update</p>"
-    "<form method='POST' action='/update' enctype='multipart/form-data'>"
     "<p>Select firmware binary (.bin):</p>"
-    "<input type='file' name='firmware' accept='.bin'>"
-    "<input type='submit' value='Upload Firmware'>"
-    "</form>"
+    "<input type='file' id='file' accept='.bin'>"
+    "<button onclick='upload()'>Upload Firmware</button>"
+    "<p id='status'></p>"
+    "<script>"
+    "function upload(){"
+    "var f=document.getElementById('file').files[0];"
+    "if(!f){alert('Select a .bin file first');return;}"
+    "document.getElementById('status').innerText='Uploading...';"
+    "fetch('/update',{method:'POST',body:f,"
+    "headers:{'Content-Type':'application/octet-stream'}})"
+    ".then(r=>r.text()).then(t=>{document.body.innerHTML=t;})"
+    ".catch(e=>{document.getElementById('status').innerText='Upload error: '+e;});}"
+    "</script>"
     "</body></html>";
 
 // OTA state
