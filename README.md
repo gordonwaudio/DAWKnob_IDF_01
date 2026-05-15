@@ -113,7 +113,7 @@ The binary to upload is `build/DAWKnob_IDF_01.bin`.
 With the device powered on and BLE running, press and hold the **WiFi button (GPIO27)**.  
 The **WiFi LED (GPIO18)** will light up once the device has connected to your network.
 
-### 3. Open the update page
+### 3. Open the update page http://192.168.1.103/update
 
 In a browser on the same network, navigate to:
 
